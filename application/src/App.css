@@ -1,0 +1,28 @@
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.card-input {
+  width: 360px;
+  padding: 10px 20px 0px 20px;
+}
+
+.form-label{
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.btn-submit {
+  margin-top: 10px;
+  width: 100%;
+  font-weight: 500;
+}
+
+.advice-text {
+  margin-top: 10px;
+  font-weight: 500;
+  color: blue;
+}
