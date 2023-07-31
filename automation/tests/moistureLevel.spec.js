@@ -6,56 +6,165 @@ let moistureLevelPage;
 
 test.beforeEach(async ({ page }) => {
   moistureLevelPage = new MoistureLevelPage(page);
+
   await moistureLevelPage.goto();
 });
 
-test("Page Load Test", async () => {
-  expect(moistureLevelPage.formSoilType).not.toBeNull();
-  expect(moistureLevelPage.formMoistureLevel).not.toBeNull();
-  expect(moistureLevelPage.btnSubmit).not.toBeNull();
+test.describe("On page load", () => {
+  test("Check elements", async () => {
+    expect(moistureLevelPage.formSoilType).not.toBeNull();
+    expect(moistureLevelPage.formMoistureLevel).not.toBeNull();
+    expect(moistureLevelPage.btnSubmit).not.toBeNull();
+  });
 });
 
-test("Soil Type not selected Validation Test", async () => {
-  await moistureLevelPage.clickBtnSubmit();
+test.describe("Check not filled fields", () => {
+  test("Soil Type not selected", async () => {
+    await moistureLevelPage.clickBtnSubmit();
 
-  expect(await moistureLevelPage.adviceText.innerText()).toEqual("Selecione o tipo de solo.");
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.selectSoilType);
+  });
+
+  test("Moisture Level not filled", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.thin);
+    await moistureLevelPage.clickBtnSubmit();
+
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.insertMoiustureLevel);
+  });
 });
 
-test("Moisture Level not filled Validation Test", async () => {
-  await moistureLevelPage.selectSoilType("fino");
-  await moistureLevelPage.clickBtnSubmit();
+test.describe("Check moisture level range values", () => {
+  test("Moisture level min -1", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.thin);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilMoistureLimits.min - 1);
+    await moistureLevelPage.clickBtnSubmit();
 
-  expect(await moistureLevelPage.adviceText.innerText()).toEqual("Insira o nível de umidade do solo.");
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.valueRangeWarning);
+  });
+
+  test("Moisture level min", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.thin);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilMoistureLimits.min);
+    await moistureLevelPage.clickBtnSubmit();
+
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.lowMoistureDanger);
+  });
+
+  test("Moisture level max", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.thin);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilMoistureLimits.max);
+    await moistureLevelPage.clickBtnSubmit();
+
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.irrigationNotRequired);
+  });
+
+  test("Moisture level max +1", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.thin);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilMoistureLimits.max + 1);
+    await moistureLevelPage.clickBtnSubmit();
+
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.valueRangeWarning);
+  });
 });
 
-test("Moisture Level Limits Validation Test value(-1)", async () => {
-  await moistureLevelPage.selectSoilType("fino");
-  await moistureLevelPage.setMoistureLevel(-1);
-  await moistureLevelPage.clickBtnSubmit();
+test.describe("Check Thin soil moisture level", () => {
+  test("Soil upper level limit", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.thin);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilConfigs.thin.upper);
+    await moistureLevelPage.clickBtnSubmit();
 
-  expect(await moistureLevelPage.adviceText.innerText()).toEqual("Insira um nível de umidade entre 0 e 100.");
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.irrigationNotRequired);
+  });
+
+  test("Soil upper -1 level limit", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.thin);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilConfigs.thin.upper - 1);
+    await moistureLevelPage.clickBtnSubmit();
+
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.irrigationRequired);
+  });
+
+  test("Soil lower level limit", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.thin);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilConfigs.thin.lower);
+    await moistureLevelPage.clickBtnSubmit();
+
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.irrigationRequired);
+  });
+
+  test("Soil lower -1 level limit", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.thin);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilConfigs.thin.lower - 1);
+    await moistureLevelPage.clickBtnSubmit();
+
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.lowMoistureDanger);
+  });
 });
 
-test("Moisture Level Limits Validation Test  value(101)", async () => {
-  await moistureLevelPage.selectSoilType("médio");
-  await moistureLevelPage.setMoistureLevel(101);
-  await moistureLevelPage.clickBtnSubmit();
+test.describe("Check Mid soil moisture level", () => {
+  test("Soil upper level limit", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.mid);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilConfigs.mid.upper);
+    await moistureLevelPage.clickBtnSubmit();
 
-  expect(await moistureLevelPage.adviceText.innerText()).toEqual("Insira um nível de umidade entre 0 e 100.");
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.irrigationNotRequired);
+  });
+
+  test("Soil upper -1 level limit", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.mid);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilConfigs.mid.upper - 1);
+    await moistureLevelPage.clickBtnSubmit();
+
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.irrigationRequired);
+  });
+
+  test("Soil lower level limit", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.mid);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilConfigs.mid.lower);
+    await moistureLevelPage.clickBtnSubmit();
+
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.irrigationRequired);
+  });
+
+  test("Soil lower -1 level limit", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.mid);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilConfigs.mid.lower - 1);
+    await moistureLevelPage.clickBtnSubmit();
+
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.lowMoistureDanger);
+  });
 });
 
-test("Moisture Level Limits Validation Test value(0)", async () => {
-  await moistureLevelPage.selectSoilType("grosseiro");
-  await moistureLevelPage.setMoistureLevel(0);
-  await moistureLevelPage.clickBtnSubmit();
+test.describe("Check Rough soil moisture level", () => {
+  test("Soil upper level limit", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.rough);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilConfigs.rough.upper);
+    await moistureLevelPage.clickBtnSubmit();
 
-  expect(await moistureLevelPage.adviceText.innerText()).toEqual("Umidade do solo perigosamente baixa!");
-});
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.irrigationNotRequired);
+  });
 
-test("Moisture Level Limits Validation Test  value(100)", async () => {
-  await moistureLevelPage.selectSoilType("médio");
-  await moistureLevelPage.setMoistureLevel(100);
-  await moistureLevelPage.clickBtnSubmit();
+  test("Soil upper -1 level limit", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.rough);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilConfigs.rough.upper - 1);
+    await moistureLevelPage.clickBtnSubmit();
 
-  expect(await moistureLevelPage.adviceText.innerText()).toEqual("Irrigação não é necessária neste momento.");
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.irrigationRequired);
+  });
+
+  test("Soil lower level limit", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.rough);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilConfigs.rough.lower);
+    await moistureLevelPage.clickBtnSubmit();
+
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.irrigationRequired);
+  });
+
+  test("Soil lower -1 level limit", async () => {
+    await moistureLevelPage.selectSoilType(moistureLevelPage.soilTypes.rough);
+    await moistureLevelPage.setMoistureLevel(moistureLevelPage.soilConfigs.rough.lower - 1);
+    await moistureLevelPage.clickBtnSubmit();
+
+    expect(await moistureLevelPage.adviceText.innerText()).toEqual(moistureLevelPage.adviceMessages.lowMoistureDanger);
+  });
 });

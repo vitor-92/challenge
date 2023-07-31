@@ -3,9 +3,9 @@ import { useState } from "react";
 import { Form, Button, Card } from "react-bootstrap";
 
 const soilMoistureLimits = {
-  fino: { lower: 60, upper: 80 },
-  médio: { lower: 70, upper: 88 },
-  grosseiro: { lower: 80, upper: 90 },
+  thin: { lower: 60, upper: 80 },
+  mid: { lower: 70, upper: 88 },
+  rough: { lower: 80, upper: 90 },
 };
 
 const getIrrigationAdvice = (soilType, moistureLevel) => {
@@ -51,9 +51,9 @@ function App() {
             <Form.Label>Tipo de solo</Form.Label>
             <Form.Control className="soil-type" as="select" value={soilType} onChange={(e) => setSoilType(e.target.value)}>
               <option value="">Selecione o tipo de solo...</option>
-              <option value="fino">Fino (argila)</option>
-              <option value="médio">Médio (argilosa)</option>
-              <option value="grosseiro">Grosseiro (arenosa)</option>
+              <option value="thin">Fino (argila)</option>
+              <option value="mid">Médio (argilosa)</option>
+              <option value="rough">Grosseiro (arenosa)</option>
             </Form.Control>
           </Form.Group>
           <Form.Group controlId="formMoistureLevel">
