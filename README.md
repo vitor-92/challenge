@@ -24,6 +24,7 @@ This project uses Playwright, a reliable end-to-end testing framework for web ap
 5. Inside the automation folder, install the necessary dependencies with npm:
     ```bash
     npm install
+    npx playwright install-deps
     ```
 
 ## Run Tests
